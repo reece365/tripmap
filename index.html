@@ -8,7 +8,7 @@
   <head>
     <title>Simple Map</title>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-    <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+    <script src="exif.js"></script>
   </head>
 
   <body>
@@ -69,24 +69,21 @@
 
         initMap();
 
-        let imagesArray = [];
+        let imageData = [];
+
+        function extractExif(blob) {
+            return EXIF.readFromBinaryFile(blob)
+        }
 
         function loadImages() {
             const mapImages = document.getElementById("mapImageSelector").files;
-            for (image in mapImages) {
-                console.log(mapImages[image].arrayBuffer())
-                mapImages[image].arrayBuffer().then((value) => {
-                    imagesArray.push(value)
+            for (image of mapImages) {
+                image.arrayBuffer().then((value) => {
+                    imageData.push({"image": image, "exif": extractExif(value)});
                 })
- 
             }
         }
 
-        function extractExif(blob) {
-            EXIF.readFromBinaryFile(blob, () => {
-                console.info(EXIF.getTag(this, "Make"));
-            })
-        }
     </script>
   </body>
 </html>
