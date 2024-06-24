@@ -48,7 +48,7 @@
     </style>
 
     <!-- Image that will be mapped -->
-    <input type="file" id="mapImage" name="mapImage" accept="image/jpeg" />  
+    <input type="file" id="mapImageSelector" accept="image/jpeg" multiple/>  
 
     <script>
         /**
@@ -69,10 +69,22 @@
 
         initMap();
 
-        function extractExif() {
-            let img = document.getElementById("mapImage")
-            EXIF.getData(img, () => {
-                console.info(EXIF.pretty);
+        let imagesArray = [];
+
+        function loadImages() {
+            const mapImages = document.getElementById("mapImageSelector").files;
+            for (image in mapImages) {
+                console.log(mapImages[image].arrayBuffer())
+                mapImages[image].arrayBuffer().then((value) => {
+                    imagesArray.push(value)
+                })
+ 
+            }
+        }
+
+        function extractExif(blob) {
+            EXIF.readFromBinaryFile(blob, () => {
+                console.info(EXIF.getTag(this, "Make"));
             })
         }
     </script>
