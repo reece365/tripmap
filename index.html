@@ -1,9 +1,5 @@
 <!doctype html>
-<!--
- @license
- Copyright 2019 Google LLC. All Rights Reserved.
- SPDX-License-Identifier: Apache-2.0
--->
+
 <html>
   <head>
     <title>Simple Map</title>
@@ -51,19 +47,15 @@
     <input type="file" id="mapImageSelector" accept="image/jpeg" multiple/>  
 
     <script>
-        /**
-         * @license
-         * Copyright 2019 Google LLC. All Rights Reserved.
-         * SPDX-License-Identifier: Apache-2.0
-         */
         let map;
 
         async function initMap() {
-        const { Map } = await google.maps.importLibrary("maps");
+            const { Map } = await google.maps.importLibrary("maps");
+            const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
-        map = new Map(document.getElementById("map"), {
-            center: { lat: -34.397, lng: 150.644 },
-            zoom: 8,
+            map = new Map(document.getElementById("map"), {
+                center: { lat: -34.397, lng: 150.644 },
+                zoom: 8,
         });
         }
 
@@ -82,6 +74,27 @@
                     imageData.push({"image": image, "exif": extractExif(value)});
                 })
             }
+        }
+
+        async function convertExifLocation(exifLat, exifLong) {
+            //Convert from the EXIF format of GPS coordinates (degrees, minutes, seconds), to a decimal format
+            console.log(new google.maps.LatLng((exifLat[0]) + (exifLat[1]/60) + (exifLat[2]/3600), (exifLong[0]) + (exifLong[1]/60) + (exifLong/3600)))
+            return new google.maps.LatLng((exifLat[0]) + (exifLat[1]/60) + (exifLat[2]/3600), (exifLong[0]) + (exifLong[1]/60) + (exifLong/3600))
+        }
+
+        async function showImageOnMap(image) {
+            const { Map } = await google.maps.importLibrary("maps");
+            const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
+            let imageLat = image.exif.GPSLatitude
+            let imageLong = image.exif.GPSLongitude
+
+            const marker = new AdvancedMarkerElement({
+                map: map,
+                position: convertExifLocation(imageLat, imageLong),
+                title: "Uluru",
+            });
+
         }
 
     </script>
